@@ -1,0 +1,26 @@
+{
+  "name": "@grip/api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "sync": "node scripts/sync-contract.mjs",
+    "gen": "openapi-typescript openapi.yaml -o src/schema.d.ts",
+    "test": "vitest run",
+    "typecheck": "tsc",
+    "build": "npm run typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5",
+    "yaml": "^2.9.1"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0"
+  }
+}

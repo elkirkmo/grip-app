@@ -1,11 +1,12 @@
 # grip-app
 
 A web app for renting and lending gear. It works with any backend that implements the
-API contract in `packages/api/openapi.yaml` (coming next). The reference backend is grip-api.
+API contract in `packages/api/openapi.yaml`. The reference backend is grip-api.
 
 | Workspace | What it is |
 | --- | --- |
 | `apps/web` | The renter-facing web app: Vite, React, TypeScript, Tailwind. |
+| `packages/api` | The API contract (`openapi.yaml`), types generated from it, and a typed client (`createApiClient`). |
 
 ## Run it locally
 
@@ -30,3 +31,15 @@ never put secrets here.
 | --- | --- |
 | `VITE_API_BASE_URL` | Base URL of the backend |
 | `VITE_APP_NAME` | Name shown in the page title and header |
+
+## The API contract
+
+`packages/api/openapi.yaml` lists only the public operations this app calls. Any backend that
+implements it works. Types in `src/schema.d.ts` are generated from it, and CI fails if they're stale.
+
+To pick up backend changes, or to use a new endpoint:
+
+1. Add the endpoint's `operationId` to `OPERATIONS` in `packages/api/scripts/sync-contract.mjs`.
+   The script refuses operations that need a login.
+2. `npm run sync -w @grip/api -- <path to the backend's openapi.yaml>`
+3. `npm run gen -w @grip/api`

@@ -1,0 +1,168 @@
+# The API this app needs. Built by scripts/sync-contract.mjs; change OPERATIONS there, not this file.
+openapi: 3.0.3
+info:
+  title: Grip app API contract
+  version: 0.1.0
+paths:
+  /api/catalog/:
+    get:
+      operationId: catalog_list
+      description: Public list of gear that can be rented. Retired items are hidden.
+      tags:
+        - catalog
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CatalogGear"
+          description: ""
+  /api/catalog/{id}/:
+    get:
+      operationId: catalog_retrieve
+      description: Public list of gear that can be rented. Retired items are hidden.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this gear.
+          required: true
+      tags:
+        - catalog
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogGear"
+          description: ""
+  /api/catalog/availability/:
+    get:
+      operationId: catalog_availability_retrieve
+      description: >-
+        Whether a renter can book each item for every day from start_date to
+        due_date.
+
+
+        Each item has its own limits on rental length and how far ahead it can
+        be booked.
+      parameters:
+        - in: query
+          name: due_date
+          schema:
+            type: string
+            format: date
+          description: "Inclusive: the day the gear comes back."
+          required: true
+        - in: query
+          name: ids
+          schema:
+            type: array
+            items:
+              type: integer
+            maxItems: 100
+          description: Gear ids to check, as ?ids=1&ids=2. Leave out to check all active
+            gear.
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          required: true
+      tags:
+        - catalog
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Availability"
+          description: ""
+components:
+  schemas:
+    Availability:
+      type: object
+      description: Yes or no per item, with a reason when it's no. Never says who has
+        an item.
+      properties:
+        start_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ItemAvailability"
+      required:
+        - due_date
+        - items
+        - start_date
+    CatalogGear:
+      type: object
+      description: What the public sees. Never add serial numbers, replacement values,
+        or who has an item.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        category:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        daily_rate:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        max_rental_days:
+          type: integer
+          maximum: 32767
+          minimum: 1
+          description: Longest a renter can book this item for themselves, in days. Staff
+            bookings here aren't limited.
+        max_days_ahead:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          description: How many days ahead a renter can book this item. 0 means today only.
+      required:
+        - daily_rate
+        - id
+        - name
+    ItemAvailability:
+      type: object
+      properties:
+        id:
+          type: integer
+        available:
+          type: boolean
+        reason:
+          nullable: true
+          oneOf:
+            - $ref: "#/components/schemas/UnavailableReason"
+            - $ref: "#/components/schemas/NullEnum"
+      required:
+        - available
+        - id
+        - reason
+    NullEnum:
+      enum:
+        - null
+    UnavailableReason:
+      enum:
+        - too_far_ahead
+        - too_long
+        - booked
+      type: string
+      description: |-
+        * `too_far_ahead` - Too Far Ahead
+        * `too_long` - Too Long
+        * `booked` - Booked
