@@ -104,8 +104,7 @@ components:
         - start_date
     CatalogGear:
       type: object
-      description: What the public sees. Never add serial numbers, replacement values,
-        or who has an item.
+      description: An item anyone can rent.
       properties:
         id:
           type: integer
@@ -126,13 +125,12 @@ components:
           type: integer
           maximum: 32767
           minimum: 1
-          description: Longest a renter can book this item for themselves, in days. Staff
-            bookings here aren't limited.
+          description: Longest this item can be booked for, in days.
         max_days_ahead:
           type: integer
           maximum: 32767
           minimum: 0
-          description: How many days ahead a renter can book this item. 0 means today only.
+          description: How many days ahead this item can be booked. 0 means today only.
       required:
         - daily_rate
         - id

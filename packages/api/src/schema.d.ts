@@ -71,7 +71,7 @@ export interface components {
             due_date: string;
             items: components["schemas"]["ItemAvailability"][];
         };
-        /** @description What the public sees. Never add serial numbers, replacement values, or who has an item. */
+        /** @description An item anyone can rent. */
         CatalogGear: {
             readonly id: number;
             name: string;
@@ -79,9 +79,9 @@ export interface components {
             description?: string;
             /** Format: decimal */
             daily_rate: string;
-            /** @description Longest a renter can book this item for themselves, in days. Staff bookings here aren't limited. */
+            /** @description Longest this item can be booked for, in days. */
             max_rental_days?: number;
-            /** @description How many days ahead a renter can book this item. 0 means today only. */
+            /** @description How many days ahead this item can be booked. 0 means today only. */
             max_days_ahead?: number;
         };
         ItemAvailability: {
