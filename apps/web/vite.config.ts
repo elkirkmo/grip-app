@@ -19,6 +19,7 @@ export default defineConfig(({ command, mode }) => {
     plugins: [react(), tailwindcss()],
     test: {
       environment: 'jsdom',
+      setupFiles: ['src/test/setup.ts'],
       env: { VITE_API_BASE_URL: 'http://api.test', VITE_APP_NAME: 'Test Rentals' },
     },
   }

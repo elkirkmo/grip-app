@@ -21,16 +21,21 @@ npm test
 npm run build
 ```
 
+**Adding a dependency:** `npm install <package>` hits [npm/cli#4828](https://github.com/npm/cli/issues/4828)
+here and drops Vite's native bundler from `package-lock.json` ("Cannot find native binding"). Add the package to the
+workspace's `package.json` by hand, then `rm -rf node_modules */*/node_modules package-lock.json && npm install`.
+
 ## Configuration
 
 Set in `apps/web/.env.local` locally, and in the hosting provider's environment settings for
-deployments. The build fails if either is missing. Values end up in the browser bundle, so
+deployments. The build fails if either of the first two is missing. Values end up in the browser bundle, so
 never put secrets here.
 
 | Variable | What it is |
 | --- | --- |
 | `VITE_API_BASE_URL` | Base URL of the backend |
 | `VITE_APP_NAME` | Name shown in the page title and header |
+| `VITE_CURRENCY` | Optional ISO currency code for prices; defaults to `USD` |
 
 ## The API contract
 
