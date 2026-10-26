@@ -83,6 +83,16 @@ export interface components {
             max_rental_days?: number;
             /** @description How many days ahead this item can be booked. 0 means today only. */
             max_days_ahead?: number;
+            /**
+             * Format: uri
+             * @description Photo, about 1600px on the long edge.
+             */
+            readonly image_url: string | null;
+            /**
+             * Format: uri
+             * @description The same photo, about 400px on the long edge.
+             */
+            readonly thumbnail_url: string | null;
         };
         ItemAvailability: {
             id: number;

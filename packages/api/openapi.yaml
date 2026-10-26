@@ -131,10 +131,24 @@ components:
           maximum: 32767
           minimum: 0
           description: How many days ahead this item can be booked. 0 means today only.
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          description: Photo, about 1600px on the long edge.
+        thumbnail_url:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          description: The same photo, about 400px on the long edge.
       required:
         - daily_rate
         - id
+        - image_url
         - name
+        - thumbnail_url
     ItemAvailability:
       type: object
       properties:
