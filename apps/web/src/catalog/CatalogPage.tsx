@@ -1,11 +1,9 @@
 import type { CatalogGear, ItemAvailability } from '@grip/api'
-import { useEffect } from 'react'
-import { addToCart, cartRange, keepOnlyInCart, removeFromCart, setCartDates, useCart } from '../cart/cart'
-import { config } from '../config'
-import { localToday } from './dates'
+import { addToCart, cartRange, removeFromCart, useCart } from '../cart/cart'
+import DateFields from '../cart/DateFields'
+import { money } from '../money'
+import { Status, Thumbnail } from './parts'
 import { useAvailability, useCatalog } from './queries'
-
-const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: config.currency })
 
 export default function CatalogPage() {
   const cart = useCart()
@@ -13,39 +11,9 @@ export default function CatalogPage() {
   const catalog = useCatalog()
   const availability = useAvailability(range)
 
-  useEffect(() => {
-    if (catalog.data) keepOnlyInCart(new Set(catalog.data.map((gear) => gear.id)))
-  }, [catalog.data])
-
-  function setDates(start: string, due: string) {
-    // Keep the range sensible as the start moves: a due date before the start follows it.
-    setCartDates(start, due && due >= start ? due : start)
-  }
-
   return (
     <section>
-      <form className="flex flex-wrap items-end gap-4" onSubmit={(e) => e.preventDefault()}>
-        <label className="flex flex-col text-sm">
-          Pick up
-          <input
-            type="date"
-            className="mt-1 rounded border border-neutral-300 px-2 py-1"
-            min={localToday()}
-            value={cart.start}
-            onChange={(e) => setDates(e.target.value, cart.due)}
-          />
-        </label>
-        <label className="flex flex-col text-sm">
-          Return
-          <input
-            type="date"
-            className="mt-1 rounded border border-neutral-300 px-2 py-1"
-            min={cart.start || localToday()}
-            value={cart.due}
-            onChange={(e) => setDates(cart.start || e.target.value, e.target.value)}
-          />
-        </label>
-      </form>
+      <DateFields />
 
       {availability.isError && (
         <p role="alert" className="mt-4 text-red-700">
@@ -140,32 +108,4 @@ function CartButton({ gear, inCart }: { gear: CatalogGear; inCart: boolean }) {
       Add to cart {name}
     </button>
   )
-}
-
-const THUMB ='size-16 shrink-0 rounded bg-neutral-200 object-cover sm:size-20'
-
-/** A square crop of the item's photo, or a grey square of the same size so rows line up. */
-function Thumbnail({ url }: { url: string | null }) {
-  // The name sits right beside it, so the photo adds nothing for screen readers.
-  if (!url) return <div className={THUMB} aria-hidden="true" />
-  return <img src={url} alt="" width={80} height={80} loading="lazy" decoding="async" className={THUMB} />
-}
-
-function Status({ gear, status }: { gear: CatalogGear; status: ItemAvailability }) {
-  const [text, tone] = statusText(gear, status)
-  return <span className={`shrink-0 rounded px-2 py-0.5 text-sm ${tone}`}>{text}</span>
-}
-
-function statusText(gear: CatalogGear, status: ItemAvailability): [string, string] {
-  const no = 'bg-neutral-100 text-neutral-700'
-  switch (status.reason) {
-    case null:
-      return ['Available', 'bg-green-100 text-green-800']
-    case 'booked':
-      return ['Booked', no]
-    case 'too_long':
-      return [`Max ${gear.max_rental_days} days`, no]
-    case 'too_far_ahead':
-      return [gear.max_days_ahead === 0 ? 'Same-day only' : `Book within ${gear.max_days_ahead} days`, no]
-  }
 }

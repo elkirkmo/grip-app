@@ -1,40 +1,13 @@
-import type { CatalogGear } from '@grip/api'
 import { fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { CART_KEY, type Cart } from '../cart/cart'
+import { CART_KEY } from '../cart/cart'
+import { availability, catalog, pinToday, storeCart, storedCart } from '../test/fixtures'
 import { renderApp } from '../test/renderApp'
-
-// In the order grip-api sends it: by category, so uncategorized gear comes first.
-const gear: CatalogGear[] = [
-  { id: 4, name: 'Sandbag', category: '', description: '', daily_rate: '2.00', max_rental_days: 7, max_days_ahead: 0, image_url: null, thumbnail_url: null },
-  { id: 1, name: 'Aputure 600d', category: 'Lighting', description: 'Daylight LED', daily_rate: '75.00', max_rental_days: 7, max_days_ahead: 60, image_url: 'https://img.test/gear/1/a.webp', thumbnail_url: 'https://img.test/gear/1/a-thumb.webp' },
-  { id: 2, name: 'Skypanel S60', category: 'Lighting', description: '', daily_rate: '150.00', max_rental_days: 2, max_days_ahead: 60, image_url: null, thumbnail_url: null },
-  { id: 3, name: 'C-stand', category: 'Grip', description: '', daily_rate: '10.00', max_rental_days: 7, max_days_ahead: 60, image_url: null, thumbnail_url: null },
-]
-
-const catalog = () => Response.json(gear)
-const availability = () =>
-  Response.json({
-    start_date: '2026-11-02',
-    due_date: '2026-11-04',
-    items: [
-      { id: 1, available: true, reason: null },
-      { id: 2, available: false, reason: 'too_long' },
-      { id: 3, available: false, reason: 'booked' },
-      { id: 4, available: false, reason: 'too_far_ahead' },
-    ],
-  })
 
 const row = (name: string) => screen.getByText(name, { selector: 'p' }).closest('li')!
 const availabilityCalls = (requests: URL[]) => requests.filter((url) => url.pathname === '/api/catalog/availability/')
-const storeCart = (cart: Partial<Cart>) => localStorage.setItem(CART_KEY, JSON.stringify({ ids: [], start: '', due: '', ...cart }))
-const storedCart = (): Cart => JSON.parse(localStorage.getItem(CART_KEY)!)
 
-// The cart forgets past dates, so pin "today" for tests that store dates.
-beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'] })
-  vi.setSystemTime(new Date(2026, 9, 30, 12))
-})
+beforeEach(pinToday)
 afterEach(() => vi.useRealTimers())
 
 describe('catalog', () => {
