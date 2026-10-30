@@ -6,7 +6,7 @@ import { renderApp } from '../test/renderApp'
 // In the order grip-api sends it: by category, so uncategorized gear comes first.
 const gear: CatalogGear[] = [
   { id: 4, name: 'Sandbag', category: '', description: '', daily_rate: '2.00', max_rental_days: 7, max_days_ahead: 0, image_url: null, thumbnail_url: null },
-  { id: 1, name: 'Aputure 600d', category: 'Lighting', description: 'Daylight LED', daily_rate: '75.00', max_rental_days: 7, max_days_ahead: 60, image_url: null, thumbnail_url: null },
+  { id: 1, name: 'Aputure 600d', category: 'Lighting', description: 'Daylight LED', daily_rate: '75.00', max_rental_days: 7, max_days_ahead: 60, image_url: 'https://img.test/gear/1/a.webp', thumbnail_url: 'https://img.test/gear/1/a-thumb.webp' },
   { id: 2, name: 'Skypanel S60', category: 'Lighting', description: '', daily_rate: '150.00', max_rental_days: 2, max_days_ahead: 60, image_url: null, thumbnail_url: null },
   { id: 3, name: 'C-stand', category: 'Grip', description: '', daily_rate: '10.00', max_rental_days: 7, max_days_ahead: 60, image_url: null, thumbnail_url: null },
 ]
@@ -34,6 +34,14 @@ describe('catalog', () => {
     expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual(['Lighting', 'Grip', 'Other'])
     expect(within(row('Aputure 600d')).getByText(/75\.00\/day · up to 7 days/)).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Test Rentals' })).toBeTruthy()
+  })
+
+  test('shows each photo as a thumbnail, and a blank square without one', async () => {
+    renderApp('/', { '/api/catalog/': catalog })
+    await screen.findByText('Aputure 600d')
+    expect(row('Aputure 600d').querySelector('img')?.getAttribute('src')).toBe('https://img.test/gear/1/a-thumb.webp')
+    expect(row('C-stand').querySelector('img')).toBeNull()
+    expect(row('C-stand').querySelector('[aria-hidden="true"]')).toBeTruthy()
   })
 
   test('waits for both dates before checking availability', async () => {

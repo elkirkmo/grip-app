@@ -92,8 +92,9 @@ function byCategory(gear: CatalogGear[]): [string, CatalogGear[]][] {
 
 function GearRow({ gear, checking, status }: { gear: CatalogGear; checking: boolean; status?: ItemAvailability }) {
   return (
-    <li className="flex items-start justify-between gap-4 py-3">
-      <div>
+    <li className="flex items-start gap-4 py-3">
+      <Thumbnail url={gear.thumbnail_url} />
+      <div className="min-w-0 flex-1">
         <p className="font-medium">{gear.name}</p>
         {gear.description && <p className="text-sm text-neutral-600">{gear.description}</p>}
         <p className="text-sm text-neutral-500">
@@ -103,6 +104,15 @@ function GearRow({ gear, checking, status }: { gear: CatalogGear; checking: bool
       {checking ? <span className="text-sm text-neutral-400">Checking…</span> : status && <Status gear={gear} status={status} />}
     </li>
   )
+}
+
+const THUMB = 'size-16 shrink-0 rounded bg-neutral-200 object-cover sm:size-20'
+
+/** A square crop of the item's photo, or a grey square of the same size so rows line up. */
+function Thumbnail({ url }: { url: string | null }) {
+  // The name sits right beside it, so the photo adds nothing for screen readers.
+  if (!url) return <div className={THUMB} aria-hidden="true" />
+  return <img src={url} alt="" width={80} height={80} loading="lazy" decoding="async" className={THUMB} />
 }
 
 function Status({ gear, status }: { gear: CatalogGear; status: ItemAvailability }) {
