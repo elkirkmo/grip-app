@@ -1,23 +1,25 @@
 import type { CatalogGear, ItemAvailability } from '@grip/api'
-import { useSearchParams } from 'react-router'
+import { useEffect } from 'react'
+import { addToCart, cartRange, keepOnlyInCart, removeFromCart, setCartDates, useCart } from '../cart/cart'
 import { config } from '../config'
-import { localToday, rangeFrom } from './dates'
+import { localToday } from './dates'
 import { useAvailability, useCatalog } from './queries'
 
 const money = new Intl.NumberFormat(undefined, { style: 'currency', currency: config.currency })
 
 export default function CatalogPage() {
-  const [params, setParams] = useSearchParams()
-  const range = rangeFrom(params)
+  const cart = useCart()
+  const range = cartRange(cart)
   const catalog = useCatalog()
   const availability = useAvailability(range)
 
+  useEffect(() => {
+    if (catalog.data) keepOnlyInCart(new Set(catalog.data.map((gear) => gear.id)))
+  }, [catalog.data])
+
   function setDates(start: string, due: string) {
     // Keep the range sensible as the start moves: a due date before the start follows it.
-    const next = new URLSearchParams(params)
-    next.set('start', start)
-    next.set('due', due && due >= start ? due : start)
-    setParams(next, { replace: true })
+    setCartDates(start, due && due >= start ? due : start)
   }
 
   return (
@@ -29,8 +31,8 @@ export default function CatalogPage() {
             type="date"
             className="mt-1 rounded border border-neutral-300 px-2 py-1"
             min={localToday()}
-            value={params.get('start') ?? ''}
-            onChange={(e) => setDates(e.target.value, params.get('due') ?? '')}
+            value={cart.start}
+            onChange={(e) => setDates(e.target.value, cart.due)}
           />
         </label>
         <label className="flex flex-col text-sm">
@@ -38,9 +40,9 @@ export default function CatalogPage() {
           <input
             type="date"
             className="mt-1 rounded border border-neutral-300 px-2 py-1"
-            min={params.get('start') || localToday()}
-            value={params.get('due') ?? ''}
-            onChange={(e) => setDates(params.get('start') || e.target.value, e.target.value)}
+            min={cart.start || localToday()}
+            value={cart.due}
+            onChange={(e) => setDates(cart.start || e.target.value, e.target.value)}
           />
         </label>
       </form>
@@ -67,6 +69,7 @@ export default function CatalogPage() {
                 <GearRow
                   key={gear.id}
                   gear={gear}
+                  inCart={cart.ids.includes(gear.id)}
                   checking={range !== null && availability.isFetching}
                   status={availability.data?.get(gear.id)}
                 />
@@ -90,7 +93,14 @@ function byCategory(gear: CatalogGear[]): [string, CatalogGear[]][] {
   return [...groups].sort(([a], [b]) => Number(a === OTHER) - Number(b === OTHER))
 }
 
-function GearRow({ gear, checking, status }: { gear: CatalogGear; checking: boolean; status?: ItemAvailability }) {
+interface GearRowProps {
+  gear: CatalogGear
+  inCart: boolean
+  checking: boolean
+  status?: ItemAvailability
+}
+
+function GearRow({ gear, inCart, checking, status }: GearRowProps) {
   return (
     <li className="flex items-start gap-4 py-3">
       <Thumbnail url={gear.thumbnail_url} />
@@ -101,12 +111,38 @@ function GearRow({ gear, checking, status }: { gear: CatalogGear; checking: bool
           {money.format(Number(gear.daily_rate))}/day · up to {gear.max_rental_days} days
         </p>
       </div>
-      {checking ? <span className="text-sm text-neutral-400">Checking…</span> : status && <Status gear={gear} status={status} />}
+      <div className="flex shrink-0 flex-col items-end gap-2">
+        {checking ? <span className="text-sm text-neutral-400">Checking…</span> : status && <Status gear={gear} status={status} />}
+        <CartButton gear={gear} inCart={inCart} />
+      </div>
     </li>
   )
 }
 
-const THUMB = 'size-16 shrink-0 rounded bg-neutral-200 object-cover sm:size-20'
+/** Any item can go in the cart, whatever its availability; the cart flags problems for its dates. */
+function CartButton({ gear, inCart }: { gear: CatalogGear; inCart: boolean }) {
+  // The item's name is for screen readers, which otherwise hear a list of identical buttons.
+  const name = <span className="sr-only">{gear.name}</span>
+  return inCart ? (
+    <button
+      type="button"
+      className="rounded border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-100"
+      onClick={() => removeFromCart(gear.id)}
+    >
+      Remove {name}
+    </button>
+  ) : (
+    <button
+      type="button"
+      className="rounded bg-neutral-900 px-3 py-1 text-sm text-white hover:bg-neutral-700"
+      onClick={() => addToCart(gear.id)}
+    >
+      Add to cart {name}
+    </button>
+  )
+}
+
+const THUMB ='size-16 shrink-0 rounded bg-neutral-200 object-cover sm:size-20'
 
 /** A square crop of the item's photo, or a grey square of the same size so rows line up. */
 function Thumbnail({ url }: { url: string | null }) {
