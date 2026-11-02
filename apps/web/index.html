@@ -5,6 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>%VITE_APP_NAME%</title>
+    <script>
+      // Apply a saved theme before the page draws, so it doesn't flash. Same key as THEME_KEY in src/theme.ts.
+      try {
+        var theme = localStorage.getItem('grip.theme')
+        if (theme === 'light' || theme === 'dark') document.documentElement.classList.add(theme)
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

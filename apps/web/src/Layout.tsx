@@ -3,10 +3,12 @@ import { Link, Outlet } from 'react-router'
 import { keepOnlyInCart, useCart } from './cart/cart'
 import { useCatalog } from './catalog/queries'
 import { config } from './config'
+import { toggleTheme, useTheme } from './theme'
 
 export default function Layout() {
   const cart = useCart()
   const catalog = useCatalog()
+  const theme = useTheme()
 
   // Retired gear falls out of the cart, so the count is right on every page.
   useEffect(() => {
@@ -24,9 +26,19 @@ export default function Layout() {
         <Link to="/" className="text-2xl font-semibold">
           {config.appName}
         </Link>
-        <Link to="/cart" className="text-sm hover:underline">
-          Cart ({cart.ids.length})
-        </Link>
+        <div className="flex items-baseline gap-4">
+          <Link to="/cart" className="text-sm hover:underline">
+            Cart ({cart.ids.length})
+          </Link>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="text-sm hover:underline"
+          >
+            {theme === 'dark' ? '☀\uFE0E' : '☾'}
+          </button>
+        </div>
       </header>
       <main>
         <Outlet />
