@@ -1,6 +1,6 @@
 import type { CatalogGear, ItemAvailability } from '@grip/api'
 
-const THUMB = 'size-16 shrink-0 rounded bg-neutral-200 object-cover sm:size-20'
+const THUMB = 'size-16 shrink-0 rounded bg-neutral-200 dark:bg-neutral-800 object-cover sm:size-20'
 
 /** A square crop of the item's photo, or a grey square of the same size so rows line up. */
 export function Thumbnail({ url }: { url: string | null }) {
@@ -16,10 +16,10 @@ export function Status({ gear, status }: { gear: CatalogGear; status: ItemAvaila
 }
 
 function statusText(gear: CatalogGear, status: ItemAvailability): [string, string] {
-  const no = 'bg-neutral-100 text-neutral-700'
+  const no = 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'
   switch (status.reason) {
     case null:
-      return ['Available', 'bg-green-100 text-green-800']
+      return ['Available', 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300']
     case 'booked':
       return ['Booked', no]
     case 'too_long':

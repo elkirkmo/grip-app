@@ -16,7 +16,7 @@ export default function Layout() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       {config.homeName && config.homeUrl && (
-        <a href={config.homeUrl} className="mb-4 inline-block text-sm text-neutral-600 hover:underline">
+        <a href={config.homeUrl} className="mb-4 inline-block text-sm text-neutral-600 dark:text-neutral-400 hover:underline">
           ← Back to {config.homeName}
         </a>
       )}

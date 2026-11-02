@@ -16,14 +16,14 @@ export default function CatalogPage() {
       <DateFields />
 
       {availability.isError && (
-        <p role="alert" className="mt-4 text-red-700">
+        <p role="alert" className="mt-4 text-red-700 dark:text-red-400">
           {availability.error.message}
         </p>
       )}
 
-      {catalog.isPending && <p className="mt-8 text-neutral-500">Loading gear…</p>}
+      {catalog.isPending && <p className="mt-8 text-neutral-500 dark:text-neutral-400">Loading gear…</p>}
       {catalog.isError && (
-        <p role="alert" className="mt-8 text-red-700">
+        <p role="alert" className="mt-8 text-red-700 dark:text-red-400">
           Couldn't load the gear list. {catalog.error.message}
         </p>
       )}
@@ -32,7 +32,7 @@ export default function CatalogPage() {
         byCategory(catalog.data).map(([category, items]) => (
           <section key={category} className="mt-8">
             <h2 className="text-lg font-semibold">{category}</h2>
-            <ul className="mt-2 divide-y divide-neutral-200">
+            <ul className="mt-2 divide-y divide-neutral-200 dark:divide-neutral-800">
               {items.map((gear) => (
                 <GearRow
                   key={gear.id}
@@ -74,13 +74,13 @@ function GearRow({ gear, inCart, checking, status }: GearRowProps) {
       <Thumbnail url={gear.thumbnail_url} />
       <div className="min-w-0 flex-1">
         <p className="font-medium">{gear.name}</p>
-        {gear.description && <p className="text-sm text-neutral-600">{gear.description}</p>}
-        <p className="text-sm text-neutral-500">
+        {gear.description && <p className="text-sm text-neutral-600 dark:text-neutral-400">{gear.description}</p>}
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
           {money.format(Number(gear.daily_rate))}/day · up to {gear.max_rental_days} days
         </p>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
-        {checking ? <span className="text-sm text-neutral-400">Checking…</span> : status && <Status gear={gear} status={status} />}
+        {checking ? <span className="text-sm text-neutral-400 dark:text-neutral-500">Checking…</span> : status && <Status gear={gear} status={status} />}
         <CartButton gear={gear} inCart={inCart} />
       </div>
     </li>
@@ -94,7 +94,7 @@ function CartButton({ gear, inCart }: { gear: CatalogGear; inCart: boolean }) {
   return inCart ? (
     <button
       type="button"
-      className="rounded border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-100"
+      className="rounded border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
       onClick={() => removeFromCart(gear.id)}
     >
       Remove {name}
@@ -102,7 +102,7 @@ function CartButton({ gear, inCart }: { gear: CatalogGear; inCart: boolean }) {
   ) : (
     <button
       type="button"
-      className="rounded bg-neutral-900 px-3 py-1 text-sm text-white hover:bg-neutral-700"
+      className="rounded bg-neutral-900 px-3 py-1 text-sm text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-300"
       onClick={() => addToCart(gear.id)}
     >
       Add to cart {name}

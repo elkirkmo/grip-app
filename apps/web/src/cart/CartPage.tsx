@@ -44,19 +44,19 @@ export default function CartPage() {
       </div>
 
       {availability.isError && (
-        <p role="alert" className="mt-4 text-red-700">
+        <p role="alert" className="mt-4 text-red-700 dark:text-red-400">
           {availability.error.message}
         </p>
       )}
-      {catalog.isPending && <p className="mt-8 text-neutral-500">Loading your cart…</p>}
+      {catalog.isPending && <p className="mt-8 text-neutral-500 dark:text-neutral-400">Loading your cart…</p>}
       {catalog.isError && (
-        <p role="alert" className="mt-8 text-red-700">
+        <p role="alert" className="mt-8 text-red-700 dark:text-red-400">
           Couldn't load your cart. {catalog.error.message}
         </p>
       )}
 
       {items.length > 0 && (
-        <ul className="mt-6 divide-y divide-neutral-200">
+        <ul className="mt-6 divide-y divide-neutral-200 dark:divide-neutral-800">
           {items.map((gear) => (
             <CartRow
               key={gear.id}
@@ -70,25 +70,25 @@ export default function CartPage() {
       )}
 
       {blocked && (
-        <p className="mt-4 rounded bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <p className="mt-4 rounded bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
           Some items can't be booked for these dates. Remove them or try other dates.
         </p>
       )}
 
       {items.length > 0 && (
-        <div className="mt-6 border-t border-neutral-300 pt-4">
+        <div className="mt-6 border-t border-neutral-300 dark:border-neutral-700 pt-4">
           {days && subtotal !== null ? (
             <>
               <p className="flex justify-between font-medium">
                 <span>Estimated subtotal, {plural(days, 'day')}</span>
                 <span>{money.format(subtotal / 100)}</span>
               </p>
-              <p className="mt-1 text-sm text-neutral-500">The final price, with any discount, is set when you book.</p>
+              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">The final price, with any discount, is set when you book.</p>
             </>
           ) : (
-            <p className="text-neutral-600">Pick your dates to see the price.</p>
+            <p className="text-neutral-600 dark:text-neutral-400">Pick your dates to see the price.</p>
           )}
-          <p className="mt-6 text-sm text-neutral-600">Booking needs an account — coming soon.</p>
+          <p className="mt-6 text-sm text-neutral-600 dark:text-neutral-400">Booking needs an account — coming soon.</p>
         </div>
       )}
     </section>
@@ -108,16 +108,16 @@ function CartRow({ gear, days, checking, status }: CartRowProps) {
       <Thumbnail url={gear.thumbnail_url} />
       <div className="min-w-0 flex-1">
         <p className="font-medium">{gear.name}</p>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
           {money.format(Number(gear.daily_rate))}/day
           {days && ` × ${plural(days, 'day')} = ${money.format((cents(gear.daily_rate) * days) / 100)}`}
         </p>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
-        {checking ? <span className="text-sm text-neutral-400">Checking…</span> : status && <Status gear={gear} status={status} />}
+        {checking ? <span className="text-sm text-neutral-400 dark:text-neutral-500">Checking…</span> : status && <Status gear={gear} status={status} />}
         <button
           type="button"
-          className="rounded border border-neutral-300 px-3 py-1 text-sm hover:bg-neutral-100"
+          className="rounded border border-neutral-300 dark:border-neutral-700 px-3 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           onClick={() => removeFromCart(gear.id)}
         >
           Remove <span className="sr-only">{gear.name}</span>

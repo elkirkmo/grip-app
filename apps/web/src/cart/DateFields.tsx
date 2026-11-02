@@ -16,7 +16,7 @@ export default function DateFields() {
         Pick up
         <input
           type="date"
-          className="mt-1 rounded border border-neutral-300 px-2 py-1"
+          className="mt-1 rounded border border-neutral-300 dark:border-neutral-700 px-2 py-1"
           min={localToday()}
           value={cart.start}
           onChange={(e) => setDates(e.target.value, cart.due)}
@@ -26,7 +26,7 @@ export default function DateFields() {
         Return
         <input
           type="date"
-          className="mt-1 rounded border border-neutral-300 px-2 py-1"
+          className="mt-1 rounded border border-neutral-300 dark:border-neutral-700 px-2 py-1"
           min={cart.start || localToday()}
           value={cart.due}
           onChange={(e) => setDates(cart.start || e.target.value, e.target.value)}
