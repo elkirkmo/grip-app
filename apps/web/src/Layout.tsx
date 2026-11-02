@@ -15,6 +15,11 @@ export default function Layout() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
+      {config.homeName && config.homeUrl && (
+        <a href={config.homeUrl} className="mb-4 inline-block text-sm text-neutral-600 hover:underline">
+          ← Back to {config.homeName}
+        </a>
+      )}
       <header className="mb-8 flex items-baseline justify-between gap-4">
         <Link to="/" className="text-2xl font-semibold">
           {config.appName}
